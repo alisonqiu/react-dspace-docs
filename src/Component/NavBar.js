@@ -20,47 +20,47 @@ import {useContext, useState} from "react";
 import _ from 'lodash';
 
 export default function ResponsiveAppBar(props) {
-  const {typeForTable, setTypeForTable, search_object, set_search_object, drawerOpen, setDrawerOpen, handleDrawerOpen, handleDrawerClose, dataSet, setDataSet, pageType, labels, setLabels,
+  // const {typeForTable, setTypeForTable, search_object, set_search_object, drawerOpen, setDrawerOpen, handleDrawerOpen, handleDrawerClose, dataSet, setDataSet, pageType, labels, setLabels,
   
-    totalResultsCount, setTotalResultsCount,
-    page, setPage,
-    rowsPerPage, setRowsPerPage,
+  //   totalResultsCount, setTotalResultsCount,
+  //   page, setPage,
+  //   rowsPerPage, setRowsPerPage,
 
-    sortingReq, setSortingReq,
-    field, setField,
-    direction, setDirection,
-  } = useContext(props.context)
-  const [anchorElNav, setAnchorElNav] = React.useState(null);
+  //   sortingReq, setSortingReq,
+  //   field, setField,
+  //   direction, setDirection,
+  // } = useContext(props.context)
+  // const [anchorElNav, setAnchorElNav] = React.useState(null);
 
-  const handleOpenNavMenu = (event) => {
-    setAnchorElNav(event.currentTarget);
-  };
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+  // const handleOpenNavMenu = (event) => {
+  //   setAnchorElNav(event.currentTarget);
+  // };
+  // const handleCloseNavMenu = () => {
+  //   setAnchorElNav(null);
+  // };
 
-  const color = (() =>{
-    if(pageType === "voyage") {
-      if(dataSet==="0") {
-        return "voyageTrans"
-      }else{
-        return "voyageIntra"
-      }
-    }
+  // const color = (() =>{
+  //   if(pageType === "voyage") {
+  //     if(dataSet==="0") {
+  //       return "voyageTrans"
+  //     }else{
+  //       return "voyageIntra"
+  //     }
+  //   }
 
-    if(typeForTable === "enslavers"){
-      return "success"
-    }
+  //   if(typeForTable === "enslavers"){
+  //     return "success"
+  //   }
 
-    if(dataSet==="0") {
-      return "primary"
-    }else{
-      return "secondary"
-    }
-  })()
+  //   if(dataSet==="0") {
+  //     return "primary"
+  //   }else{
+  //     return "secondary"
+  //   }
+  // })()
 
   return (
-    <AppBar position="sticky" color={color} elevation={0} style={{zIndex:4}}>
+    <AppBar position="sticky"  elevation={0} style={{zIndex:4}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <Icon>
@@ -84,7 +84,7 @@ export default function ResponsiveAppBar(props) {
             Voyages
           </Typography>
 
-          <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
+           {/* <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
               aria-label="account of current user"
@@ -113,7 +113,7 @@ export default function ResponsiveAppBar(props) {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-                {/* <MenuItem onClick={handleCloseNavMenu}>
+                <MenuItem onClick={handleCloseNavMenu}>
                 {pageType !== "home" ? 
                 <IconButton
                   aria-label="open drawer"
@@ -133,14 +133,14 @@ export default function ResponsiveAppBar(props) {
                 <Link to={"/past"} style={{ textDecoration: "none" }}>
                     Past
                 </Link>
-                </MenuItem> */}
-                <MenuItem onClick={handleCloseNavMenu}>
+                </MenuItem> 
+                {/* <MenuItem onClick={handleCloseNavMenu}>
                 <Link to={"/Documents"} style={{ textDecoration: "none" }}>
                     Documents
                 </Link>
-                </MenuItem>
+                </MenuItem> 
                 
-
+{/* 
                 <ThemeProvider theme={switchTheme}>
               {search_object && typeForTable === "slaves" || pageType === "voyage" ?
                               <MenuItem>
@@ -220,11 +220,11 @@ export default function ResponsiveAppBar(props) {
                 </MenuItem>:
                 null}
 
-          </ThemeProvider>
+          </ThemeProvider> 
 
             </Menu>
-          </Box>
-          <Typography
+          </Box>/*}
+          {/* <Typography
             variant="h5"
             noWrap
             component="a"
@@ -241,8 +241,8 @@ export default function ResponsiveAppBar(props) {
             }}
           >
             Voyages
-          </Typography>
-          <ThemeProvider theme={switchTheme}>
+          </Typography> */}
+          {/* <ThemeProvider theme={switchTheme}>
             <Stack spacing={4} direction={"row"} justifyContent="flex-end"
                    alignItems="flex-end" sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}>
 
@@ -329,15 +329,15 @@ export default function ResponsiveAppBar(props) {
                 </ToggleButtonGroup>:
                 null}
             </Stack>
-          </ThemeProvider>
+          </ThemeProvider> */}
 
-          <Box
+         {/* <Box
             display="flex"
             justifyContent="flex-end"
             alignItems="flex-end"
             sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
           >
-            {/* <Link to={"/voyage/Scatter"} style={{ textDecoration: "none" }}>
+             <Link to={"/voyage/Scatter"} style={{ textDecoration: "none" }}>
               <Button
                 sx={{
                   my: 2,
@@ -361,7 +361,7 @@ export default function ResponsiveAppBar(props) {
                 Past
               </Button>
             </Link> */}
-
+{/* 
             <Link to={"/Documents"} style={{ textDecoration: "none" }}>
               <Button
                 sx={{
@@ -373,8 +373,8 @@ export default function ResponsiveAppBar(props) {
               >
                 Documents
               </Button>
-            </Link>
-          </Box>
+            </Link> 
+          </Box>*/}
         </Toolbar>
       </Container>
     </AppBar>

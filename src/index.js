@@ -2,11 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import {QueryClient, QueryClientProvider} from "react-query";
 import {BrowserRouter, Route, Routes} from "react-router-dom";
-import VoyageApp from "./Component/VoyagePage/VoyageApp";
-import Home2 from "./Component/HomePage-darkmode/home";
-import OptionSelector from "./Component/util/optionSelector";
 import DocumentsApp from "./Component/Documents/DocumentsApp";
-import Map from './Component/VoyagePage/mapping/Map2';
 import { ThemeProvider } from '@mui/material/styles';
 import {theme} from "./Theme";
 
