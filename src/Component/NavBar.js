@@ -113,7 +113,7 @@ export default function ResponsiveAppBar(props) {
                 display: { xs: 'block', md: 'none' },
               }}
             >
-                <MenuItem onClick={handleCloseNavMenu}>
+                {/* <MenuItem onClick={handleCloseNavMenu}>
                 {pageType !== "home" ? 
                 <IconButton
                   aria-label="open drawer"
@@ -133,7 +133,7 @@ export default function ResponsiveAppBar(props) {
                 <Link to={"/past"} style={{ textDecoration: "none" }}>
                     Past
                 </Link>
-                </MenuItem>
+                </MenuItem> */}
                 <MenuItem onClick={handleCloseNavMenu}>
                 <Link to={"/Documents"} style={{ textDecoration: "none" }}>
                     Documents
@@ -337,7 +337,7 @@ export default function ResponsiveAppBar(props) {
             alignItems="flex-end"
             sx={{ flexGrow: 1, display: { xs: "none", md: "flex" } }}
           >
-            <Link to={"/voyage/Scatter"} style={{ textDecoration: "none" }}>
+            {/* <Link to={"/voyage/Scatter"} style={{ textDecoration: "none" }}>
               <Button
                 sx={{
                   my: 2,
@@ -360,19 +360,8 @@ export default function ResponsiveAppBar(props) {
               >
                 Past
               </Button>
-            </Link>
-            {/* <Link to={"/Blog"} style={{ textDecoration: "none" }}>
-              <Button
-                sx={{
-                  my: 2,
-                  color: "white",
-                  display: "block",
-                  position: "right",
-                }}
-              >
-                Blog
-              </Button>
             </Link> */}
+
             <Link to={"/Documents"} style={{ textDecoration: "none" }}>
               <Button
                 sx={{
