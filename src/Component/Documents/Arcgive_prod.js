@@ -3,13 +3,6 @@ import { Button, Modal, Box, Container, Avatar, ListItem,Dialog,TablePagination,
 import "universalviewer/dist/esm/index.css";
 import { init } from "universalviewer";
 
-import ImageList from '@mui/material/ImageList';
-import ImageListItem from '@mui/material/ImageListItem';
-import ImageListItemBar from '@mui/material/ImageListItemBar';
-import IconButton from '@mui/material/IconButton';
-import InfoIcon from '@mui/icons-material/Info';
-
-import { LazyLoadImage, trackWindowScroll } from 'react-lazy-load-image-component';
 import ArchiveItem from "./ArchiveItem";
 
 import {
@@ -75,13 +68,13 @@ export default function Archive() {
     const [pics, setPics] = useState([]);
     const temp = []
 
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
-    };
-    const handleChangeRowsPerPage = (event) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      setPage(0);
-    };
+    // const handleChangePage = (event, newPage) => {
+    //   setPage(newPage);
+    // };
+    // const handleChangeRowsPerPage = (event) => {
+    //   setRowsPerPage(parseInt(event.target.value, 10));
+    //   setPage(0);
+    // };
 
     const handleOpen = (manifest) => {
       setOpen(true);
@@ -105,11 +98,9 @@ export default function Archive() {
           body: data,
           headers: {'Authorization':AUTH_TOKEN}
         }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
+        
       },[])
 
-      useEffect(()=>{
-        console.log(window.scrollY)}
-      ,[window.scrollY])
 
       useEffect(()=>{
         const fetchData = async () => {
@@ -136,89 +127,25 @@ export default function Archive() {
             return fetch(Object.values(iifUri), {
               method: "GET",
             }).then(res => Promise.resolve(res.json())).then(res => {
-            // setPics([...pics, <ArchiveItem img ={curImage(res.thumbnail[0].id)} title={res.label.none[0]} uri={iifUri.url} scrollPosition={window.scrollY} handleOpen={handleOpen}/>])
-              // temp.push(<ArchiveItem img ={curImage(res.thumbnail[0].id)} title={res.label.none[0]} uri={iifUri.url} scrollPosition={window.scrollY} handleOpen={handleOpen}/>);
               return ({"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":iifUri.url});
             })
           })
           const response = await Promise.all(promises)
           setData(response)
+
         }
         fetchData().catch(console.error);
       }, [apiUrl])
-    // console.log(itemData)
 
-    // for(const url of apiUrl){
-    //     fetch(Object.values(url), {method: "GET"}).then(res => res.json()).then(res => {
-    //       var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":url}
-    //       return dict;
-    //     }).then(res => setPics(...pics, res.image))
-    // }
-
-    // if(itemData.length < 20){
-    //   return <CircularProgress />
-    // }
     return (
-        // <div>
-        //     <TablePagination
-        //       component="div"
-        //       count={total}
-        //       page={page}
-        //       onPageChange={handleChangePage}
-        //       rowsPerPage={rowsPerPage}
-        //       onRowsPerPageChange={handleChangeRowsPerPage}
-        //       rowsPerPageOptions={[16, 25, 36, 49, 64]}
-        //     />
-        //     <ImageList sx={{ width: width, height: (page + 1) * rowsPerPage > total ? 200: height }} cols={
-        //       (page + 1) * rowsPerPage > total ? 8 :
-        //       Math.sqrt(rowsPerPage)
-        //       } gap={30} >
-        //     {/* <ImageList sx={{ width: width, height: height }} cols={parseInt(width/300)} gap={20} > */}
-        //       {itemData.map((item) => (
-        //         <ImageListItem key={item.image}>
-        //           <img
-        //             src={`${item.image}?w=248&fit=crop&auto=format`}
-        //             srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-        //             alt={item.title}
-        //             loading="lazy"
-        //           />
-        //           <ImageListItemBar
-        //             title={item.title}
-        //             sx ={{
-        //               bgcolor: alpha('#549165',0.8)
-        //             }}
-        //             actionIcon={
-        //               <IconButton
-        //                 sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-        //                 aria-label={`info about ${item.title}`}
-        //                 onClick={() => handleOpen(item.uri.url)}
-        //               >
-        //                 <InfoIcon />
-        //               </IconButton>
-        //             }
-        //           />
-        //         </ImageListItem>
-        //       ))}
-        //     </ImageList>
-        //     <Modal
-        //         open={open}
-        //         onClose={handleClose}
-        //         aria-labelledby="modal-modal-title"
-        //         aria-describedby="modal-modal-description"
-        //     >
-        //         <Box sx={modalStyle}>
-        //             <UV manifest={manifest} />
-        //         </Box>
-        //     </Modal>
-        // </div>
+       
+       
       <div>
-        {/* <Gallery itemData={itemData} scrollPosition={window.scrollY} handleOpen={handleOpen}/> */}
         <Grid  container spacing={{ xs: 2, md: 2, lg:2}} padding={{ xs: 4, md: 3, lg:4 }}>
-        {/* {itemData.map(item => {
-          return <ArchiveItem image ={item.image} title={item.title} uri={item.uri} scrollPosition={window.scrollY} handleOpen={handleOpen}/>
-        })} */}
+       
         {apiUrl.map((item,index) => {
-          return <ArchiveItem  key={index} iifUrl={item} scrollPosition={window.scrollY} handleOpen={handleOpen} page = {page} setPage={setPage}/>
+          console.log('rerender')
+          return <ArchiveItem  key={index} iifUrl={item} scrollPosition={window.scrollY} handleOpen={handleOpen} apiUrl = {apiUrl} page = {page} setPage={setPage}/>
           
         })}
         </Grid>

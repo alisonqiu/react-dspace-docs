@@ -14,12 +14,13 @@ function curImage(src){
 }
 
 function ArchiveItem(props){
-      const { iifUrl, scrollPosition, handleOpen,setPage,page} = props
+      const { iifUrl, scrollPosition, handleOpen,setPage,page,apiUrl} = props
       console.log("🚀 ~ file: ArchiveItem.js ~ line 17 ~ ArchiveItem ~ page", page)
       const [image, setImage] = React.useState();
       const [atBottom, setAtBottom] = React.useState(false);
       const [title, setTitle] = React.useState();
       const [uri, setUri] = React.useState();
+      const [loading, setLoading] = React.useState(true)
 
       window.onscroll = function(ev) {
         if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
@@ -37,12 +38,18 @@ function ArchiveItem(props){
 
 
       useEffect(() => {
+        
         fetch(iifUrl.url).then(res => Promise.resolve(res.json())).then(res => {
           setTitle(res.label.none[0]);
           setImage(curImage(res.thumbnail[0].id));
           setUri(iifUrl.url);
         });
-      }, [])
+      }, [apiUrl])
+
+      useEffect(() => {
+      
+      }, [apiUrl])
+
 
       return(
       <Grid item xs={12} sm={6} md={4} lg={3} width="40vh" >
