@@ -2,6 +2,8 @@ import React, { useRef, useState, useEffect, useLayoutEffect ,useCallback} from 
 import { Button, Modal, Box, Container, Avatar, ListItem,Dialog,TablePagination, CardMedia, Typography, Grid, Link, CircularProgress } from "@mui/material";
 import "universalviewer/dist/esm/index.css";
 import { init } from "universalviewer";
+import InfiniteScroll from "react-infinite-scroll-component";
+
 
 import ArchiveItem from "./ArchiveItem";
 
@@ -53,6 +55,7 @@ function curImage(src){
 }
 
 
+
 export default function Archive() {
     const [width, height] = useWindowSize()
     const [manifest, setManifest]= useState({});
@@ -75,6 +78,24 @@ export default function Archive() {
     //   setRowsPerPage(parseInt(event.target.value, 10));
     //   setPage(0);
     // };
+
+    const fetchData = async () => {
+      console.log("🚀 ~ file: Arcgive_prod.js ~ line 97 ~ fetchData ~ fetchData", fetchData)
+      var data = new FormData();
+      data.append("hierarchical", "False");
+      data.append("selected_fields", 'url');
+      data.append("results_per_page", 16);
+      data.append("results_page", page + 1);
+      const res = await fetch('https://voyages3-api.crc.rice.edu/docs/',{
+        method: 'POST',
+        body: data,
+        headers: {'Authorization':AUTH_TOKEN}
+      })
+      const result = await res.json();
+      setapiurl(result)
+      setPage(prev => prev+1)
+    }
+
 
     const handleOpen = (manifest) => {
       setOpen(true);
@@ -118,7 +139,7 @@ export default function Archive() {
         setapiurl(result)
       }
         fetchData().catch(console.error);
-      },[page,rowsPerPage])
+      },[])
       console.log("🚀 ~ file: Arcgive_prod.js ~ line 142 ~ Archive ~ page", page)
 
       useEffect(() => {
@@ -143,12 +164,26 @@ export default function Archive() {
       <div>
         <Grid  container spacing={{ xs: 2, md: 2, lg:2}} padding={{ xs: 4, md: 3, lg:4 }}>
        
+        <InfiniteScroll
+        dataLength={apiUrl.length} //This is important field to render the next data
+        next={fetchData}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
+        endMessage={
+          <p style={{ textAlign: 'center' }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+        //https://github.com/ankeetmaini/react-infinite-scroll-component/issues/308
+
+
+      >
         {apiUrl.map((item,index) => {
-          console.log('rerender')
-          return <ArchiveItem  key={index} iifUrl={item} scrollPosition={window.scrollY} handleOpen={handleOpen} apiUrl = {apiUrl} page = {page} setPage={setPage}/>
-          
+          return <ArchiveItem  key={index} iifUrl={item} scrollPosition={window.scrollY} handleOpen={handleOpen} apiUrl = {apiUrl} />
         })}
-        </Grid>
+      </InfiniteScroll>
+      </Grid>
+
         <Modal
             open={open}
             onClose={handleClose}

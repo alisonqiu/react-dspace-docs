@@ -14,27 +14,21 @@ function curImage(src){
 }
 
 function ArchiveItem(props){
-      const { iifUrl, scrollPosition, handleOpen,setPage,page,apiUrl} = props
-      console.log("🚀 ~ file: ArchiveItem.js ~ line 17 ~ ArchiveItem ~ page", page)
+      const { iifUrl, scrollPosition, handleOpen,apiUrl} = props
+
       const [image, setImage] = React.useState();
-      const [atBottom, setAtBottom] = React.useState(false);
       const [title, setTitle] = React.useState();
       const [uri, setUri] = React.useState();
       const [loading, setLoading] = React.useState(true)
 
-      window.onscroll = function(ev) {
-        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
-            console.log(window.innerHeight)
-            setAtBottom(prev => !prev)
-        }
-    };
+    //   window.onscroll = function(ev) {
+    //     if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+    //         console.log(window.innerHeight)
+    //         setAtBottom(prev => !prev)
+    //     }
+    // };
 
-    useEffect(() => {
-      if (atBottom){
-        setPage(prev => prev+1)
-      }
-     
-    }, [atBottom])
+
 
 
       useEffect(() => {
@@ -46,9 +40,6 @@ function ArchiveItem(props){
         });
       }, [apiUrl])
 
-      useEffect(() => {
-      
-      }, [apiUrl])
 
 
       return(

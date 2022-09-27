@@ -2,6 +2,7 @@ import React, { useRef, useState, useEffect, useLayoutEffect } from "react";
 import { Button, Modal, Box, Container, Avatar, ListItem,Dialog,TablePagination} from "@mui/material";
 import "universalviewer/dist/esm/index.css";
 import { init } from "universalviewer";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
@@ -65,11 +66,17 @@ export default function Archive() {
     const [rowsPerPage, setRowsPerPage] = React.useState(16);
     const [total, setTotal] = useState(0)
 
-    const handleChangePage = (event, newPage) => {
-      setPage(newPage);
+    // const handleChangePage = (event, newPage) => {
+    //   setPage(newPage);
+    // };
+
+    const handleChangePage = () => {
+      setPage(prev => prev+1);
     };
+
     const handleChangeRowsPerPage = (event) => {
       setRowsPerPage(parseInt(event.target.value, 10));
+      console.log("🚀 ~ file: Archive.js ~ line 74 ~ handleChangeRowsPerPage ~ event.target.value", event.target.value)
       setPage(0);
     };
 
@@ -113,6 +120,7 @@ export default function Archive() {
       }
         fetchData().catch(console.error);
       },[page,rowsPerPage])
+      console.log("🚀 ~ file: Archive.js ~ line 123 ~ Archive ~ page", page)
 
       useEffect(() => {
         const fetchData = async ()=> {
@@ -126,14 +134,14 @@ export default function Archive() {
           })
           const response = await Promise.all(promises)
           setData(response)
-          // console.log(itemData)
+          console.log(itemData)
         }
         fetchData().catch(console.error);
       }, [apiUrl])
     // console.log(itemData)
     return (
         <div>
-            <TablePagination
+            {/* <TablePagination
               component="div"
               count={total}
               page={page}
@@ -141,7 +149,21 @@ export default function Archive() {
               rowsPerPage={rowsPerPage}
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[16, 25, 36, 49, 64]}
-            />
+            /> */}
+                    <InfiniteScroll
+        dataLength={itemData.length} //This is important field to render the next data
+        next={handleChangePage}
+        hasMore={true}
+        loader={<h4>Loading...</h4>}
+        endMessage={
+          <p style={{ textAlign: 'center' }}>
+            <b>Yay! You have seen it all</b>
+          </p>
+        }
+        //https://github.com/ankeetmaini/react-infinite-scroll-component/issues/308
+
+
+      >
             <ImageList sx={{ width: width, height: (page + 1) * rowsPerPage > total ? 200: height }} cols={
               (page + 1) * rowsPerPage > total ? 8 :
               Math.sqrt(rowsPerPage)
@@ -173,6 +195,8 @@ export default function Archive() {
                 </ImageListItem>
               ))}
             </ImageList>
+            </InfiniteScroll>
+
             <Modal
                 open={open}
                 onClose={handleClose}

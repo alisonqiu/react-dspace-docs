@@ -1,7 +1,7 @@
 import React from "react";
 import Documents from "./Documents";
-//import Archive from "./Archive";
-import Archive from "./Arcgive_prod"; 
+import Archive from "./Archive";
+//import Archive from "./Arcgive_prod"; 
 import ResponsiveAppBar from "../NavBar";
 
 const auth_token = process.env.REACT_APP_AUTHTOKEN
