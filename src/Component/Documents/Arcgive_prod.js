@@ -65,6 +65,7 @@ export default function Archive() {
     const [itemData, setData] = useState([])
 
     const [page, setPage] = React.useState(0);
+    const [hasMore, setHasMore] = useState(true);
     const [rowsPerPage, setRowsPerPage] = React.useState(16);
     const [total, setTotal] = useState(0)
     
@@ -78,23 +79,6 @@ export default function Archive() {
     //   setRowsPerPage(parseInt(event.target.value, 10));
     //   setPage(0);
     // };
-
-    const fetchData = async () => {
-      console.log("🚀 ~ file: Arcgive_prod.js ~ line 97 ~ fetchData ~ fetchData", fetchData)
-      var data = new FormData();
-      data.append("hierarchical", "False");
-      data.append("selected_fields", 'url');
-      data.append("results_per_page", 16);
-      data.append("results_page", page + 1);
-      const res = await fetch('https://voyages3-api.crc.rice.edu/docs/',{
-        method: 'POST',
-        body: data,
-        headers: {'Authorization':AUTH_TOKEN}
-      })
-      const result = await res.json();
-      setapiurl(result)
-      setPage(prev => prev+1)
-    }
 
 
     const handleOpen = (manifest) => {
@@ -112,6 +96,23 @@ export default function Archive() {
         maxHeight: 500,
       };
 
+      const fetch = async () => {
+        var data = new FormData();
+        data.append("hierarchical", "False");
+        data.append("selected_fields", 'url');
+        data.append("results_per_page", 16);
+        data.append("results_page", page + 1);
+        const res = await fetch('https://voyages3-api.crc.rice.edu/docs/',{
+          method: 'POST',
+          body: data,
+          headers: {'Authorization':AUTH_TOKEN}
+        })
+        const result = await res.json();
+        setapiurl([...apiUrl, ...result])
+        setPage(page + 1);
+        console.log("🚀 ~ file: Arcgive_prod.js ~ line 142 ~ Archive ~ page", page)
+      }
+
       useEffect(()=>{
         var data = new FormData();
         fetch('https://voyages3-api.crc.rice.edu/docs/',{
@@ -124,23 +125,8 @@ export default function Archive() {
 
 
       useEffect(()=>{
-        const fetchData = async () => {
-        var data = new FormData();
-        data.append("hierarchical", "False");
-        data.append("selected_fields", 'url');
-        data.append("results_per_page", 16);
-        data.append("results_page", page + 1);
-        const res = await fetch('https://voyages3-api.crc.rice.edu/docs/',{
-          method: 'POST',
-          body: data,
-          headers: {'Authorization':AUTH_TOKEN}
-        })
-        const result = await res.json();
-        setapiurl(result)
-      }
-        fetchData().catch(console.error);
+        fetch().catch(console.error);
       },[])
-      console.log("🚀 ~ file: Arcgive_prod.js ~ line 142 ~ Archive ~ page", page)
 
       useEffect(() => {
         const fetchData = async ()=> {
@@ -158,6 +144,7 @@ export default function Archive() {
         fetchData().catch(console.error);
       }, [apiUrl])
 
+
     return (
        
        
@@ -166,8 +153,8 @@ export default function Archive() {
        
         <InfiniteScroll
         dataLength={apiUrl.length} //This is important field to render the next data
-        next={fetchData}
-        hasMore={true}
+        next={fetch}
+        hasMore={hasMore}
         loader={<h4>Loading...</h4>}
         endMessage={
           <p style={{ textAlign: 'center' }}>

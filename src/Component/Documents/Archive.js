@@ -103,8 +103,26 @@ export default function Archive() {
         }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
       },[])
 
-      useEffect(()=>{
-        const fetchData = async () => {
+      // useEffect(()=>{
+      //   const fetchData = async () => {
+      //   var data = new FormData();
+      //   data.append("hierarchical", "False");
+      //   data.append("selected_fields", 'url');
+      //   data.append("results_per_page", rowsPerPage);
+      //   data.append("results_page", page + 1);
+      //   const res = await fetch('https://voyages3-api.crc.rice.edu/docs/',{
+      //     method: 'POST',
+      //     body: data,
+      //     headers: {'Authorization':AUTH_TOKEN}
+      //   })
+      //   const result = await res.json();
+      //   setapiurl(result)
+      // }
+      //   fetchData().catch(console.error);
+      // },[page,rowsPerPage])
+      // console.log("🚀 ~ file: Archive.js ~ line 123 ~ Archive ~ page", page)
+
+      const fetchData = async () => {
         var data = new FormData();
         data.append("hierarchical", "False");
         data.append("selected_fields", 'url');
@@ -117,10 +135,8 @@ export default function Archive() {
         })
         const result = await res.json();
         setapiurl(result)
+        setPage(page + 1);
       }
-        fetchData().catch(console.error);
-      },[page,rowsPerPage])
-      console.log("🚀 ~ file: Archive.js ~ line 123 ~ Archive ~ page", page)
 
       useEffect(() => {
         const fetchData = async ()=> {
@@ -133,7 +149,7 @@ export default function Archive() {
             })
           })
           const response = await Promise.all(promises)
-          setData(response)
+          setData([...itemData, ...response])
           console.log(itemData)
         }
         fetchData().catch(console.error);
@@ -152,7 +168,7 @@ export default function Archive() {
             /> */}
                     <InfiniteScroll
         dataLength={itemData.length} //This is important field to render the next data
-        next={handleChangePage}
+        next={fetchData}
         hasMore={true}
         loader={<h4>Loading...</h4>}
         endMessage={
