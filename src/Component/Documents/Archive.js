@@ -57,6 +57,7 @@ function curImage(src){
 }
 export default function Archive() {
     const [width, height] = useWindowSize()
+    console.log("🚀 ~ file: Archive.js ~ line 60 ~ Archive ~ height", height)
     const [manifest, setManifest]= useState({});
     const [open, setOpen] = useState(false);
     const [apiUrl,setapiurl] = useState([])
@@ -137,11 +138,8 @@ export default function Archive() {
         const result = await res.json();
         setapiurl(result)
         setPage(page + 1);
-      }
-
-      useEffect(() => {
-        const fetchData = async ()=> {
-          const promises = apiUrl.map(uri => {
+        const fetchImage = async ()=> {
+          const promises = result.map(uri => {
             return fetch(Object.values(uri), {
               method: "GET",
             }).then(res => res.json()).then(res => {
@@ -151,13 +149,33 @@ export default function Archive() {
           })
           const response = await Promise.all(promises)
           setData([...itemData, ...response])
-          console.log(itemData)
         }
-        fetchData().catch(console.error);
-      }, [apiUrl])
-    // console.log(itemData)
+        fetchImage().catch(console.error);
+      }
+
+      useEffect(()=>{
+        fetchData()
+      }, [])
     return (
-        <div>
+      <div id="infinite-container" style={{ overflow: 'auto'}}>
+      <InfiniteScroll
+      dataLength={itemData.length} //This is important field to render the next data
+      next={fetchData}
+      getScrollParent={()=>document.getElementById('infinite-container')} 
+      useWindow={false}
+
+      // pullDownToRefresh = {true}
+      // refreshFunction={()=>{
+      //   console.log('refreshed')
+      // }}
+      hasMore={true}
+      loader={<h4>Loading...</h4>}
+      endMessage={
+        <p style={{ textAlign: 'center' }}>
+          <b>Yay! You have seen it all</b>
+        </p>
+      } >
+
             {/* <TablePagination
               component="div"
               count={total}
@@ -167,25 +185,13 @@ export default function Archive() {
               onRowsPerPageChange={handleChangeRowsPerPage}
               rowsPerPageOptions={[16, 25, 36, 49, 64]}
             /> */}
-                    <InfiniteScroll
-        dataLength={itemData.length} //This is important field to render the next data
-        next={fetchData}
-        hasMore={true}
-        loader={<h4>Loading...</h4>}
-        endMessage={
-          <p style={{ textAlign: 'center' }}>
-            <b>Yay! You have seen it all</b>
-          </p>
-        }
-        //https://github.com/ankeetmaini/react-infinite-scroll-component/issues/308
 
-
-      >
+         
             <ImageList sx={{ width: width, height: (page + 1) * rowsPerPage > total ? 200: height }} cols={
               (page + 1) * rowsPerPage > total ? 8 :
               Math.sqrt(rowsPerPage)
               } gap={30} >
-            {/* <ImageList sx={{ width: width, height: height }} cols={parseInt(width/300)} gap={20} > */}
+     
               {itemData.map((item) => (
                 <ImageListItem key={item.image}>
                   <img
@@ -211,8 +217,9 @@ export default function Archive() {
                   />
                 </ImageListItem>
               ))}
+              
             </ImageList>
-            </InfiniteScroll>
+    
 
             <Modal
                 open={open}
@@ -224,6 +231,8 @@ export default function Archive() {
                     <UV manifest={manifest} />
                 </Box>
             </Modal>
+
+        </InfiniteScroll>
         </div>
     );
 }
