@@ -62,6 +62,8 @@ export default function Archive() {
     const [open, setOpen] = useState(false);
     const [apiUrl,setapiurl] = useState([])
     const [itemData, setData] = useState([])
+    const [hasMore, setHasMore] = useState(true)
+    console.log("🚀 ~ file: Archive.js ~ line 65 ~ Archive ~ itemData", itemData.length)
 
     const [page, setPage] = React.useState(0);
     const [rowsPerPage, setRowsPerPage] = React.useState(16);
@@ -149,6 +151,10 @@ export default function Archive() {
           })
           const response = await Promise.all(promises)
           setData([...itemData, ...response])
+          if(itemData.length>300){
+            setHasMore(false)
+          }
+        
         }
         fetchImage().catch(console.error);
       }
@@ -168,11 +174,10 @@ export default function Archive() {
       // refreshFunction={()=>{
       //   console.log('refreshed')
       // }}
-      hasMore={true}
+      hasMore={hasMore}
       loader={<h4>Loading...</h4>}
       endMessage={
         <p style={{ textAlign: 'center' }}>
-          <b>Yay! You have seen it all</b>
         </p>
       } >
 
@@ -187,8 +192,7 @@ export default function Archive() {
             /> */}
 
          
-            <ImageList sx={{ width: width, height: (page + 1) * rowsPerPage > total ? 200: height }} cols={
-              (page + 1) * rowsPerPage > total ? 8 :
+            <ImageList sx={{ width: width, height: height }} cols={
               Math.sqrt(rowsPerPage)
               } gap={30} >
      
