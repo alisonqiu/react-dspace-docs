@@ -3,7 +3,6 @@ import { Button, Modal, Box, Container, Avatar, ListItem,Dialog,TablePagination}
 import "universalviewer/dist/esm/index.css";
 import { init } from "universalviewer";
 import InfiniteScroll from "react-infinite-scroll-component";
-import CloverIIIF from "@samvera/clover-iiif";
 
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
@@ -18,7 +17,7 @@ import axios from "axios";
 import { SettingsOverscanOutlined } from "@mui/icons-material";
 import { alpha } from "@mui/material";
 
-const AUTH_TOKEN = process.env.REACT_APP_AUTHTOKEN;
+const AUTH_TOKEN = process.env.AD_APP_AUTHTOKEN;
 const adurl = "http://127.0.0.1:8000/advertisement/"
 const url = 'https://voyages3-api.crc.rice.edu/docs/'
 axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
@@ -93,11 +92,11 @@ export default function Archive(props) {
       //     headers: {'Authorization':AUTH_TOKEN}
       //   }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
       // },[])
-      var data = new FormData();
 
       const fetchData = async () => {
      
 
+      var data = new FormData();
 
         data.append("hierarchical", "False");
         
@@ -110,7 +109,7 @@ export default function Archive(props) {
             console.log("🚀 ~ file: Arcgive_prod.js ~ line 108 ~ filter_obj[property].forEach ~ data", property, v)
           })}
        
-        const res = await fetch(url,{
+        const res = await fetch(adurl,{
           method: 'POST',
           body: data,
           headers: {'Authorization':AUTH_TOKEN}
@@ -120,13 +119,13 @@ export default function Archive(props) {
         setPage(page + 1);
         
         const fetchImage = async ()=> {
-          const promises = result.map(uri => {
-            return fetch(Object.values(uri), {
+          const promises = result.map(dspace_iiif_uri => {
+            return fetch(Object.values(dspace_iiif_uri), {
               method: "GET",
             }).then(res => {
               return res.json()
             }).then(res => {
-              var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":uri}
+              var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":dspace_iiif_uri}
 
               return dict;
             })
@@ -148,6 +147,18 @@ export default function Archive(props) {
       useEffect(()=>{
         console.log("filter object updated")
 
+        // var data = new FormData();
+        // fetch('https://voyages3-api.crc.rice.edu/docs/',{
+        //   method: 'POST',
+        //   body: data,
+        //   headers: {'Authorization':AUTH_TOKEN}
+        // }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
+
+        //when filter_obj changes, go back to first page
+        // if(filter_obj !== {}){
+        // window.location.reload()
+
+        // }
         setPage(0);
         setData([])
         setapiurl( [])

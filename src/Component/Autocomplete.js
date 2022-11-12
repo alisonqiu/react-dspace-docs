@@ -5,6 +5,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 const header = { "Authorization": process.env.REACT_APP_AUTHTOKEN }
 const base_url = process.env.REACT_APP_BASEURL;
 const url = 'https://voyages3-api.crc.rice.edu/docs/autocomplete';
+const adurl = '127.0.0.1:8000/advertisement/autocomplete'
 const key = "title"
 
 export default function Auto(props) {

@@ -8,6 +8,7 @@ import { Slider } from '@mui/material';
 
 const base_url = process.env.REACT_APP_BASEURL;
 const url = 'https://voyages3-api.crc.rice.edu/docs/aggregations';
+const adurl = "127.0.0.1:8000/advertisement/aggregations"
 const key = "pub_year"
 
 
