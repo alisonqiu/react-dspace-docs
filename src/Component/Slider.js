@@ -43,12 +43,10 @@ export default function GetSlider(props) {
     React.useEffect(() => {
         axios(config).then(res => {
             console.log("🚀 ~ file: slider.js ~ line 42 ~ axios ~ value", value)
-
         
-
-                if(filter_obj[key][0] === 0){
-                    setRange([Object.values(res.data)[0]['min'], Object.values(res.data)[0]['max']]);
-                    setValue([Object.values(res.data)[0]['min'], Object.values(res.data)[0]['max']]);
+                if(d[key][0] === 0){
+                    setRange([Object.values(res.data)['min'], Object.values(res.data)['max']]);
+                    setValue([Object.values(res.data)['min'], Object.values(res.data)['max']]);
                 }
 
             

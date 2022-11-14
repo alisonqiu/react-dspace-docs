@@ -59,17 +59,21 @@ function curImage(src){
   
 }
 export default function Archive(props) {
+  
     const [width, height] = useWindowSize()
     const [manifest, setManifest]= useState({});
     const [open, setOpen] = useState(false);
-    const [apiUrl,setapiurl] = useState([])
-    const [itemData, setData] = useState([])
-    const [hasMore, setHasMore] = useState(true)
-    const {filter_obj, set_filter_obj} = props.state;
-
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(16);
+    const [hasMore, setHasMore] = useState(true);
     const [total, setTotal] = useState(0)
+
+    const {filter_obj, set_filter_obj,
+          page, setPage,
+          apiUrl,setapiurl,
+          itemData, setData
+        } = props.state;
+
+    //const [rowsPerPage, setRowsPerPage] = React.useState(16);
+ 
 
     const handleOpen = (manifest) => {
       setOpen(true);
@@ -81,33 +85,32 @@ export default function Archive(props) {
         left: "50%",
         transform: "translate(-50%, -50%)",
         p: 4,
-        // overflow: "scroll",
         maxHeight: 500,
       };
 
-      // useEffect(()=>{
-      //   var data = new FormData();
-      //   fetch('https://voyages3-api.crc.rice.edu/docs/',{
-      //     method: 'POST',
-      //     body: data,
-      //     headers: {'Authorization':AUTH_TOKEN}
-      //   }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
-      // },[])
+      useEffect(()=>{
+        var data = new FormData();
+        fetch('https://voyages3-api.crc.rice.edu/docs/',{
+          method: 'POST',
+          body: data,
+          headers: {'Authorization':AUTH_TOKEN}
+        }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
+        fetchData()
+      },[])
       var data = new FormData();
+      data.append("hierarchical", "False");
+        
+      data.append("selected_fields", 'url');
+      data.append("results_per_page", 16);
+      
+      data.append("results_page", page+1);
 
       const fetchData = async () => {
      
 
-
-        data.append("hierarchical", "False");
-        
-        data.append("selected_fields", 'url');
-        data.append("results_per_page", rowsPerPage);
-        data.append("results_page", page+1);
          for (const property in filter_obj) {
           filter_obj[property].forEach((v) => {
             data.append(property, v);
-            console.log("🚀 ~ file: Arcgive_prod.js ~ line 108 ~ filter_obj[property].forEach ~ data", property, v)
           })}
        
         const res = await fetch(url,{
@@ -133,10 +136,8 @@ export default function Archive(props) {
           })
           const response = await Promise.all(promises)
           setData([...itemData, ...response])
-          console.log("🚀 total data length after set data", itemData.length)
           
           if(response.length<=0){
-          //if(itemData.length>=total){
             
             setHasMore(false)
           }
@@ -146,22 +147,24 @@ export default function Archive(props) {
       }
 
       useEffect(()=>{
-        console.log("filter object updated")
 
+        
         setPage(0);
         setData([])
-        setapiurl( [])
+        setapiurl([])   
+        data.set('results_page',1)
         fetchData()
-        // setHasMore(true)
           
         
       }, [filter_obj])
 
 
+      
 
 
     return (
       <div id="infinite-container" style={{ overflow: 'auto'}}>
+  
       <InfiniteScroll
       dataLength={itemData.length} //This is important field to render the next data
       next={fetchData}
@@ -174,11 +177,13 @@ export default function Archive(props) {
         <p style={{ textAlign: 'center' }}>
           end message
         </p>
-      } >
+      } 
+      
+      >
 
 
 <ImageList sx={{ width: width, height: "99%" }} cols={
-              Math.sqrt(rowsPerPage)
+              Math.sqrt(16)
               } gap={30} >
      
               {itemData.map((item) => (

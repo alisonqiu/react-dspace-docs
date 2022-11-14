@@ -30,7 +30,7 @@ export default function ResponsiveAppBar(props) {
   const state_filter = {
     filter_obj: filter_obj,
     set_filter_obj: set_filter_obj}
-  console.log("---docapp,",filter_obj)
+  //console.log("---docapp,",filter_obj)
 
   const handleOpen = useCallback(() => setDrawerOpen(true), []);
 
