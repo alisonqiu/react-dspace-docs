@@ -119,6 +119,7 @@ export default function Archive(props) {
           headers: {'Authorization':AUTH_TOKEN}
         })
         const result = await res.json();
+        console.log("🚀 ~ file: Arcgive_prod.js ~ line 122 ~ fetchData ~ result", result)
         setapiurl(result)
         setPage(page + 1);
         
@@ -129,6 +130,7 @@ export default function Archive(props) {
             }).then(res => {
               return res.json()
             }).then(res => {
+              console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
               var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":uri}
 
               return dict;

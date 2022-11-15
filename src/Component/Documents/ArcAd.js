@@ -100,13 +100,11 @@ export default function Archive(props) {
 
         data.append("hierarchical", "False");
         
-        data.append("selected_fields", 'url');
         data.append("results_per_page", rowsPerPage);
         data.append("results_page", page+1);
          for (const property in filter_obj) {
           filter_obj[property].forEach((v) => {
             data.append(property, v);
-            console.log("🚀 ~ file: Arcgive_prod.js ~ line 108 ~ filter_obj[property].forEach ~ data", property, v)
           })}
        
         const res = await fetch(adurl,{
@@ -115,17 +113,20 @@ export default function Archive(props) {
           headers: {'Authorization':AUTH_TOKEN}
         })
         const result = await res.json();
+        console.log("🚀 ~ file: ArcAd.js ~ line 117 ~ fetchData ~ result", result)
         setapiurl(result)
         setPage(page + 1);
         
         const fetchImage = async ()=> {
-          const promises = result.map(dspace_iiif_uri => {
-            return fetch(Object.values(dspace_iiif_uri), {
+          const promises = result.map(item => {
+          console.log("🚀 ~ file: ArcAd.js ~ line 133 ~ promises ~ promises",item.dspace_iiif_uri)
+            return fetch(item.dspace_iiif_uri, {
               method: "GET",
             }).then(res => {
               return res.json()
             }).then(res => {
-              var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":dspace_iiif_uri}
+            console.log("🚀 ~ file: ArcAd.js ~ line 128 ~ returnfetch ~ res", res)
+            var dict = {"title": res.title, "image": curImage(res.thumbnail[0].id),"uri":item.dspace_iiif_uri}
 
               return dict;
             })
