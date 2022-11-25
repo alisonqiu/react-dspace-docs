@@ -64,12 +64,17 @@ export default function Archive(props) {
     const [manifest, setManifest]= useState({});
     const [open, setOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [total, setTotal] = useState(0)
+    const [total, setTotal] = useState(0);
+    var [page, setPage] = React.useState(0);
+    const [showImage,setShowImage] = React.useState(true)
+
+    console.log("🚀 ~ file: ArcAd.js ~ line 70 ~ Archive ~ page num", page)
 
     const {filter_obj, set_filter_obj,
-          page, setPage,
+          //page, setPage,
           apiUrl,setapiurl,
-          itemData, setData
+          itemData, setData,
+          //showImage,setShowImage
         } = props.state;
 
     //const [rowsPerPage, setRowsPerPage] = React.useState(16);
@@ -97,15 +102,20 @@ export default function Archive(props) {
         }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
         fetchData()
       },[])
-      var data = new FormData();
-      data.append("hierarchical", "False");
-        
-      data.append("selected_fields", 'url');
-      data.append("results_per_page", 16);
+
+
       
-      data.append("results_page", page+1);
 
       const fetchData = async () => {
+        console.log("insdie fetchData" )
+        var data = new FormData();
+        data.append("hierarchical", "False");
+          
+        data.append("selected_fields", 'url');
+        data.append("results_per_page", 16);
+        
+        data.append("results_page", page+1);
+        console.log("results_page page+1: ",page+1)
      
 
          for (const property in filter_obj) {
@@ -119,7 +129,6 @@ export default function Archive(props) {
           headers: {'Authorization':AUTH_TOKEN}
         })
         const result = await res.json();
-        console.log("🚀 ~ file: Arcgive_prod.js ~ line 122 ~ fetchData ~ result", result)
         setapiurl(result)
         setPage(page + 1);
         
@@ -130,7 +139,7 @@ export default function Archive(props) {
             }).then(res => {
               return res.json()
             }).then(res => {
-              console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
+              //console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
               var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":uri}
 
               return dict;
@@ -138,24 +147,65 @@ export default function Archive(props) {
           })
           const response = await Promise.all(promises)
           setData([...itemData, ...response])
-          
           if(response.length<=0){
             
             setHasMore(false)
+            console.log("🚀 has more is false")
           }
         
         }
         fetchImage().catch(console.error);
       }
 
-      useEffect(()=>{
+
+        const fetchData2 = async ()=> {
+          
+          // return new Promise(function(resolve, reject) {
+          //   console.log('setpage')
+          //   setPage(prev => 0);
+          //   console.log('setData')
+          //   setData(prev=>[])
+          //   console.log('setShowImage')
+          //   setShowImage(false)
+          //   return 
+           
+          // }).then ((res)=>{
+          //   console.log('promise resolved')
+          //   fetchData()
+          // }).
+          // then(setShowImage(true))
+
+          const p1 = setPage(prev => 0);
+          const p2 = setData(prev=>[]);
+          const p3 =  setShowImage(false);
+        console.log('fetchData2...')
+
+          //return Promise.all([p1,p2,p3]).then (([res1,re2s,res3])=>{
+          return new Promise(function(resolve, reject) {page = 0}).then ((res)=>{
+  
+            console.log('promise resolved with page = ',page)
+            fetchData()
+          }).
+          then(setShowImage(true))
+          
+      
+          }
+
 
         
-        setPage(0);
-        setData([])
-        setapiurl([])   
-        data.set('results_page',1)
-        fetchData()
+        
+
+
+
+
+
+     
+
+      React.useCallback(()=>{
+      console.log('filter obj changed...')
+        //setapiurl([])   
+        //setShowImage(false)
+        fetchData2()
           
         
       }, [filter_obj])
@@ -183,38 +233,40 @@ export default function Archive(props) {
       
       >
 
+{showImage? 
+ <ImageList sx={{ width: width, height: "99%" }} cols={
+  Math.sqrt(16)
+  } gap={30} >
 
-<ImageList sx={{ width: width, height: "99%" }} cols={
-              Math.sqrt(16)
-              } gap={30} >
-     
-              {itemData.map((item) => (
-                <ImageListItem key={item.image}>
-                  <img
-                    src={`${item.image}?w=248&fit=crop&auto=format`}
-                    srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                    alt={item.title}
-                    loading="lazy"
-                  />
-                  <ImageListItemBar
-                    title={item.title}
-                    sx ={{
-                      bgcolor: alpha('#549165',0.8)
-                    }}
-                    actionIcon={
-                      <IconButton
-                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                        aria-label={`info about ${item.title}`}
-                        onClick={() => handleOpen(item.uri.url)}
-                      >
-                        <InfoIcon />
-                      </IconButton>
-                    }
-                  />
-                </ImageListItem>
-              ))}
-              
-            </ImageList>
+  {itemData.map((item) => (
+    <ImageListItem key={item.image}>
+      <img
+        src={`${item.image}?w=248&fit=crop&auto=format`}
+        srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
+        alt={item.title}
+        loading="lazy"
+      />
+      <ImageListItemBar
+        title={item.title}
+        sx ={{
+          bgcolor: alpha('#549165',0.8)
+        }}
+        actionIcon={
+          <IconButton
+            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+            aria-label={`info about ${item.title}`}
+            onClick={() => handleOpen(item.uri.url)}
+          >
+            <InfoIcon />
+          </IconButton>
+        }
+      />
+    </ImageListItem>
+  ))}
+  
+</ImageList>
+: <h1>'loading'</h1>}
+         
     
     
 

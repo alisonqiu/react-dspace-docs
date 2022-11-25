@@ -19,19 +19,20 @@ export default function DocApp(props) {
         // "pub_year":[1800, 2000],
         // "title":['Plan of the Slaver Vigilante']
     })
-    const [page, setPage] = React.useState(0);
+    console.log("🚀 ~ file: DocumentsApp.js ~ line 22 ~ DocApp ~ filter_obj", filter_obj)
+    //const [page, setPage] = React.useState(0);
     const [apiUrl,setapiurl] = React.useState([])
     const [itemData, setData] = React.useState([])
-    console.log("🚀 ~ file: DocumentsApp.js ~ line 25 ~ DocApp ~ itemData", itemData)
+    console.log("🚀 ~ file: DocumentsApp.js ~ line 25 ~ DocApp ~ itemData", itemData.length)
 
     //console.log("---docapp,",filter_obj)
     const state_filter = {
         filter_obj: filter_obj,
         set_filter_obj: set_filter_obj,
-        page:page, setPage:setPage,
+        //page:page, setPage:setPage,
         apiUrl:apiUrl,setapiurl:setapiurl,
-        itemData:itemData, setData:setData
-
+        itemData:itemData, setData:setData,
+        //showImage,setShowImage
     }
     
 
