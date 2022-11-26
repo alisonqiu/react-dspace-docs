@@ -221,7 +221,8 @@ export default function Archive(props) {
 
       React.useEffect(()=>{
       console.log('filter obj changed...')
-        fetchData2()
+      setPage(0)
+      fetchData2()
           
         
       }, [
