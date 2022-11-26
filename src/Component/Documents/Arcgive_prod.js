@@ -3,7 +3,6 @@ import { Button, Modal, Box, Container, Avatar, ListItem,Dialog,TablePagination}
 import "universalviewer/dist/esm/index.css";
 import { init } from "universalviewer";
 import InfiniteScroll from "react-infinite-scroll-component";
-import CloverIIIF from "@samvera/clover-iiif";
 
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
@@ -20,7 +19,7 @@ import { alpha } from "@mui/material";
 
 const AUTH_TOKEN = process.env.REACT_APP_AUTHTOKEN;
 const adurl = "http://127.0.0.1:8000/advertisement/"
-const url = 'https://voyages3-api.crc.rice.edu/docs/'
+//const url = 'https://voyages3-api.crc.rice.edu/docs/'
 axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
 axios.defaults.headers.common["Authorization"] = AUTH_TOKEN;
 function useUniversalViewer(ref, options) {
@@ -66,18 +65,27 @@ export default function Archive(props) {
     const [hasMore, setHasMore] = useState(true);
     const [total, setTotal] = useState(0);
     var [page, setPage] = React.useState(0);
+    const [apiUrl,setapiurl] = React.useState([])
+    const [itemData, setData] = React.useState([])
     const [showImage,setShowImage] = React.useState(true)
 
-    console.log("🚀 ~ file: ArcAd.js ~ line 70 ~ Archive ~ page num", page)
+    //from enslaved
+    const [isLoading, setIsLoading] = useState(false);
+  const [dataList, setDataList] = useState([]);
+  const [pagination, setPagination] = useState({
+    currPage: 0,
+    rowsPerPage: 16,
+    totalRows: 0,
+  });
+
 
     const {filter_obj, set_filter_obj,
           //page, setPage,
-          apiUrl,setapiurl,
-          itemData, setData,
+          // apiUrl,setapiurl,
+          // itemData, setData,
           //showImage,setShowImage
         } = props.state;
 
-    //const [rowsPerPage, setRowsPerPage] = React.useState(16);
  
 
     const handleOpen = (manifest) => {
@@ -93,48 +101,100 @@ export default function Archive(props) {
         maxHeight: 500,
       };
 
-      useEffect(()=>{
-        var data = new FormData();
-        fetch('https://voyages3-api.crc.rice.edu/docs/',{
-          method: 'POST',
-          body: data,
-          headers: {'Authorization':AUTH_TOKEN}
-        }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
-        fetchData()
-      },[])
+      // useEffect(()=>{
+      //   var data = new FormData();
+      //   fetch('https://voyages3-api.crc.rice.edu/docs/',{
+      //     method: 'POST',
+      //     body: data,
+      //     headers: {'Authorization':AUTH_TOKEN}
+      //   }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
+      //   fetchData()
+      // },[])
 
 
       
 
-      const fetchData = async () => {
-        console.log("insdie fetchData" )
-        var data = new FormData();
-        data.append("hierarchical", "False");
+      // const fetchData = async () => {
+      //   console.log("insdie fetchData" )
+      //   var data = new FormData();
+      //   data.append("hierarchical", "False");
           
-        data.append("selected_fields", 'url');
-        data.append("results_per_page", 16);
+      //   data.append("selected_fields", 'url');
+      //   data.append("results_per_page", 16);
         
-        data.append("results_page", page+1);
-        console.log("results_page page+1: ",page+1)
+      //   data.append("results_page", page+1);
+      //   console.log("results_page page+1: ",page+1)
      
 
-         for (const property in filter_obj) {
-          filter_obj[property].forEach((v) => {
-            data.append(property, v);
-          })}
+      //    for (const property in filter_obj) {
+      //     filter_obj[property].forEach((v) => {
+      //       data.append(property, v);
+      //     })}
        
-        const res = await fetch(url,{
-          method: 'POST',
-          body: data,
-          headers: {'Authorization':AUTH_TOKEN}
-        })
-        const result = await res.json();
-        setapiurl(result)
-        setPage(page + 1);
+      //   const res = await fetch(url,{
+      //     method: 'POST',
+      //     body: data,
+      //     headers: {'Authorization':AUTH_TOKEN}
+      //   })
+      //   const result = await res.json();
+      //   setapiurl(result)
+      //   setPage(page + 1);
+        
+      //   const fetchImage = async ()=> {
+      //     const promises = result.map(uri => {
+      //       return fetch(Object.values(uri), {
+      //         method: "GET",
+      //       }).then(res => {
+      //         return res.json()
+      //       }).then(res => {
+      //         //console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
+      //         var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":uri}
+
+      //         return dict;
+      //       })
+      //     })
+      //     const response = await Promise.all(promises)
+      //     setData([...itemData, ...response])
+      //     if(response.length<=0){
+            
+      //       setHasMore(false)
+      //       console.log("🚀 has more is false")
+      //     }
+        
+      //   }
+      //   fetchImage().catch(console.error);
+      // }
+
+
+        const fetchData2 = async ()=> {
+          setIsLoading(true);
+          setapiurl([]);
+          let queryData = new FormData();
+          queryData.append("hierarchical", "False");
+          queryData.append("results_page", pagination.currPage + 1);
+      //   queryData.append("selected_fields", 'url');
+          queryData.append("results_per_page", pagination.rowsPerPage);
+          
+          for (const property in filter_obj) {
+            filter_obj[property].forEach((v) => {
+              queryData.append(property, v);
+            });
+          }
+          
+          axios.post("/", queryData).then((res) => {
+            console.log("🚀 ~ file: Arcgive_prod.js ~ line 185 ~ axios.post ~ res", res)
+            setPagination({
+              ...pagination,
+              totalRows: Number(res.headers.total_results_count),
+            });
+            return res.json()
+          }).then((result)=>{
+            console.log('result: ', result)
+            setapiurl(result.data.url)
         
         const fetchImage = async ()=> {
           const promises = result.map(uri => {
-            return fetch(Object.values(uri), {
+            return fetch(uri, {
               method: "GET",
             }).then(res => {
               return res.json()
@@ -154,39 +214,11 @@ export default function Archive(props) {
           }
         
         }
-        fetchImage().catch(console.error);
-      }
-
-
-        const fetchData2 = async ()=> {
-          
-          // return new Promise(function(resolve, reject) {
-          //   console.log('setpage')
-          //   setPage(prev => 0);
-          //   console.log('setData')
-          //   setData(prev=>[])
-          //   console.log('setShowImage')
-          //   setShowImage(false)
-          //   return 
-           
-          // }).then ((res)=>{
-          //   console.log('promise resolved')
-          //   fetchData()
-          // }).
-          // then(setShowImage(true))
-
-          const p1 = setPage(prev => 0);
-          const p2 = setData(prev=>[]);
-          const p3 =  setShowImage(false);
-        console.log('fetchData2...')
-
-          //return Promise.all([p1,p2,p3]).then (([res1,re2s,res3])=>{
-          return new Promise(function(resolve, reject) {page = 0}).then ((res)=>{
+        fetchImage().then(
+            setIsLoading(false)
+        ).catch(console.error);
+          })
   
-            console.log('promise resolved with page = ',page)
-            fetchData()
-          }).
-          then(setShowImage(true))
           
       
           }
@@ -201,14 +233,15 @@ export default function Archive(props) {
 
      
 
-      React.useCallback(()=>{
+      React.useEffect(()=>{
       console.log('filter obj changed...')
-        //setapiurl([])   
-        //setShowImage(false)
         fetchData2()
           
         
-      }, [filter_obj])
+      }, [
+        pagination.currPage,
+        pagination.rowsPerPage,
+        filter_obj])
 
 
       
@@ -219,7 +252,7 @@ export default function Archive(props) {
   
       <InfiniteScroll
       dataLength={itemData.length} //This is important field to render the next data
-      next={fetchData}
+      next={fetchData2}
       getScrollParent={()=>document.getElementById('infinite-container')} 
       useWindow={false}
 
