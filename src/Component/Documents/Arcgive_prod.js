@@ -19,7 +19,7 @@ import { alpha } from "@mui/material";
 
 const AUTH_TOKEN = process.env.REACT_APP_AUTHTOKEN;
 const adurl = "http://127.0.0.1:8000/advertisement/"
-//const url = 'https://voyages3-api.crc.rice.edu/docs/'
+const url = 'https://voyages3-api.crc.rice.edu/docs/'
 axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
 axios.defaults.headers.common["Authorization"] = AUTH_TOKEN;
 function useUniversalViewer(ref, options) {
@@ -114,87 +114,35 @@ export default function Archive(props) {
 
       
 
-      // const fetchData = async () => {
-      //   console.log("insdie fetchData" )
-      //   var data = new FormData();
-      //   data.append("hierarchical", "False");
+      const fetchData = async () => {
+        console.log("insdie fetchData" )
+        var data = new FormData();
+        data.append("hierarchical", "False");
           
-      //   data.append("selected_fields", 'url');
-      //   data.append("results_per_page", 16);
+        data.append("selected_fields", 'url');
+        data.append("results_per_page", 16);
         
-      //   data.append("results_page", page+1);
-      //   console.log("results_page page+1: ",page+1)
+        data.append("results_page", page+1);
+        console.log("results_page page+1: ",page+1)
      
 
-      //    for (const property in filter_obj) {
-      //     filter_obj[property].forEach((v) => {
-      //       data.append(property, v);
-      //     })}
+         for (const property in filter_obj) {
+          filter_obj[property].forEach((v) => {
+            data.append(property, v);
+          })}
        
-      //   const res = await fetch(url,{
-      //     method: 'POST',
-      //     body: data,
-      //     headers: {'Authorization':AUTH_TOKEN}
-      //   })
-      //   const result = await res.json();
-      //   setapiurl(result)
-      //   setPage(page + 1);
-        
-      //   const fetchImage = async ()=> {
-      //     const promises = result.map(uri => {
-      //       return fetch(Object.values(uri), {
-      //         method: "GET",
-      //       }).then(res => {
-      //         return res.json()
-      //       }).then(res => {
-      //         //console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
-      //         var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":uri}
-
-      //         return dict;
-      //       })
-      //     })
-      //     const response = await Promise.all(promises)
-      //     setData([...itemData, ...response])
-      //     if(response.length<=0){
-            
-      //       setHasMore(false)
-      //       console.log("🚀 has more is false")
-      //     }
-        
-      //   }
-      //   fetchImage().catch(console.error);
-      // }
-
-
-        const fetchData2 = async ()=> {
-          setIsLoading(true);
-          setapiurl([]);
-          let queryData = new FormData();
-          queryData.append("hierarchical", "False");
-          queryData.append("results_page", pagination.currPage + 1);
-      //   queryData.append("selected_fields", 'url');
-          queryData.append("results_per_page", pagination.rowsPerPage);
-          
-          for (const property in filter_obj) {
-            filter_obj[property].forEach((v) => {
-              queryData.append(property, v);
-            });
-          }
-          
-          axios.post("/", queryData).then((res) => {
-            console.log("🚀 ~ file: Arcgive_prod.js ~ line 185 ~ axios.post ~ res", res)
-            setPagination({
-              ...pagination,
-              totalRows: Number(res.headers.total_results_count),
-            });
-            return res.json()
-          }).then((result)=>{
-            console.log('result: ', result)
-            setapiurl(result.data.url)
+        const res = await fetch(url,{
+          method: 'POST',
+          body: data,
+          headers: {'Authorization':AUTH_TOKEN}
+        })
+        const result = await res.json();
+        setapiurl(result)
+        setPage(page + 1);
         
         const fetchImage = async ()=> {
           const promises = result.map(uri => {
-            return fetch(uri, {
+            return fetch(Object.values(uri), {
               method: "GET",
             }).then(res => {
               return res.json()
@@ -214,7 +162,52 @@ export default function Archive(props) {
           }
         
         }
-        fetchImage().then(
+        fetchImage().catch(console.error);
+      }
+
+      const fetchImage2 = async (result)=> {
+        const promises = result.map(item => {
+          return fetch(item['url'], {
+            method: "GET",
+          }).then(res => {
+            return res.json()
+          }).then(res => {
+            //console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
+            var dict = {"title": res.label.none[0], "image": curImage(res.thumbnail[0].id),"uri":item['url']}
+
+            return dict;
+          })
+        })
+        const response = await Promise.all(promises)
+        setData([ ...response])
+      
+      }
+
+      const fetchData2 = async ()=> {
+          setHasMore(true)
+          setIsLoading(true);
+          setData([]);
+          let queryData = new FormData();
+          queryData.append("hierarchical", "False");
+          queryData.append("results_page", pagination.currPage + 1);
+      //   queryData.append("selected_fields", 'url');
+          queryData.append("results_per_page", pagination.rowsPerPage);
+          
+          for (const property in filter_obj) {
+            filter_obj[property].forEach((v) => {
+              queryData.append(property, v);
+            });
+          }
+          
+          axios.post("/", queryData).then((res) => {
+            setPagination({
+              ...pagination,
+              totalRows: Number(res.headers.total_results_count),
+            });
+            setapiurl(res.data.url)
+         
+
+        fetchImage2(res.data).then(
             setIsLoading(false)
         ).catch(console.error);
           })
@@ -222,13 +215,6 @@ export default function Archive(props) {
           
       
           }
-
-
-        
-        
-
-
-
 
 
      
@@ -239,9 +225,10 @@ export default function Archive(props) {
           
         
       }, [
-        pagination.currPage,
-        pagination.rowsPerPage,
-        filter_obj])
+        // pagination.currPage,
+        // pagination.rowsPerPage,
+        filter_obj
+      ])
 
 
       
@@ -249,72 +236,72 @@ export default function Archive(props) {
 
     return (
       <div id="infinite-container" style={{ overflow: 'auto'}}>
+  {!isLoading? 
+        <InfiniteScroll
+        dataLength={itemData.length} //This is important field to render the next data
+        next={fetchData}
+        getScrollParent={()=>document.getElementById('infinite-container')} 
+        useWindow={false}
   
-      <InfiniteScroll
-      dataLength={itemData.length} //This is important field to render the next data
-      next={fetchData2}
-      getScrollParent={()=>document.getElementById('infinite-container')} 
-      useWindow={false}
-
-      hasMore={hasMore}
-      loader={<h4>Loading...</h4>}
-      endMessage={
-        <p style={{ textAlign: 'center' }}>
-          end message
-        </p>
-      } 
-      
-      >
-
-{showImage? 
- <ImageList sx={{ width: width, height: "99%" }} cols={
-  Math.sqrt(16)
-  } gap={30} >
-
-  {itemData.map((item) => (
-    <ImageListItem key={item.image}>
-      <img
-        src={`${item.image}?w=248&fit=crop&auto=format`}
-        srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-        alt={item.title}
-        loading="lazy"
-      />
-      <ImageListItemBar
-        title={item.title}
-        sx ={{
-          bgcolor: alpha('#549165',0.8)
-        }}
-        actionIcon={
-          <IconButton
-            sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-            aria-label={`info about ${item.title}`}
-            onClick={() => handleOpen(item.uri.url)}
-          >
-            <InfoIcon />
-          </IconButton>
-        }
-      />
-    </ImageListItem>
-  ))}
+        hasMore={hasMore}
+        loader={<h4>Loading...</h4>}
+        endMessage={
+          <p style={{ textAlign: 'center' }}>
+            end message
+          </p>
+        } 
+        
+        >
   
-</ImageList>
-: <h1>'loading'</h1>}
-         
-    
-    
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
+   <ImageList sx={{ width: width, height: "99%" }} cols={
+    Math.sqrt(16)
+    } gap={30} >
+  
+    {itemData.map((item) => (
+      <ImageListItem key={item.image}>
+        <img
+          src={`${item.image}?w=248&fit=crop&auto=format`}
+          srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
+          alt={item.title}
+          loading="lazy"
+        />
+        <ImageListItemBar
+          title={item.title}
+          sx ={{
+            bgcolor: alpha('#549165',0.8)
+          }}
+          actionIcon={
+            <IconButton
+              sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+              aria-label={`info about ${item.title}`}
+              onClick={() => handleOpen(item.uri.url)}
             >
-                <Box sx={modalStyle}>
-                    <UV manifest={manifest} />
-                </Box>
-            </Modal>
+              <InfoIcon />
+            </IconButton>
+          }
+        />
+      </ImageListItem>
+    ))}
+    
+  </ImageList>
+              
+      
+  
+              <Modal
+                  open={open}
+                  onClose={handleClose}
+                  aria-labelledby="modal-modal-title"
+                  aria-describedby="modal-modal-description"
+              >
+                  <Box sx={modalStyle}>
+                      <UV manifest={manifest} />
+                  </Box>
+              </Modal>
+  
+          </InfiniteScroll>
+  :null}
 
-        </InfiniteScroll>
         </div>
     );
 }
