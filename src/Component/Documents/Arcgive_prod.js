@@ -123,7 +123,6 @@ export default function Archive(props) {
         data.append("results_per_page", 16);
         
         data.append("results_page", page+1);
-        console.log("results_page page+1: ",page+1)
      
 
          for (const property in filter_obj) {
@@ -184,6 +183,8 @@ export default function Archive(props) {
       }
 
       const fetchData2 = async ()=> {
+        console.log("insdie fetchData2" )
+
           setHasMore(true)
           setIsLoading(true);
           setData([]);
@@ -226,8 +227,6 @@ export default function Archive(props) {
           
         
       }, [
-        // pagination.currPage,
-        // pagination.rowsPerPage,
         filter_obj
       ])
 

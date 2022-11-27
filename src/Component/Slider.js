@@ -42,7 +42,6 @@ export default function GetSlider(props) {
 
     React.useEffect(() => {
         axios(config).then(res => {
-            console.log("🚀 ~ file: slider.js ~ line 42 ~ axios ~ value", value)
         
                 if(d[key][0] === 0){
                     setRange([Object.values(res.data)['min'], Object.values(res.data)['max']]);
@@ -91,7 +90,6 @@ export default function GetSlider(props) {
             ...filter_obj,
             [key]: [value[0], value[1]]
         });
-            console.log("🚀 ~ file: slider.js ~ line 83 ~ handleBlur ~ filter_obj", filter_obj)
     });
 
     function handleCommittedChange(event, newValue) {
