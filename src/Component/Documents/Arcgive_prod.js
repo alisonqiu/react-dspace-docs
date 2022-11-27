@@ -206,6 +206,8 @@ export default function Archive(props) {
               totalRows: Number(res.headers.total_results_count),
             });
             setapiurl(res.data.url)
+            setPage(page=>page+1)
+
          
 
         fetchImage2(res.data).then(
@@ -224,11 +226,20 @@ export default function Archive(props) {
       console.log('filter obj changed...')
       setPage(0)
       fetchData2()
+      //fetchDecision(true)
           
         
       }, [
         filter_obj
       ])
+
+      // const fetchDecision = (newPage) => {
+      //   if (newPage){
+      //     return fetchData2()
+      //   }else{
+      //     return fetchData()
+      //   }
+      // }
 
 
       
@@ -240,6 +251,7 @@ export default function Archive(props) {
         <InfiniteScroll
         dataLength={itemData.length} //This is important field to render the next data
         next={fetchData}
+        //next={fetchDecision()}
         getScrollParent={()=>document.getElementById('infinite-container')} 
         useWindow={false}
   
