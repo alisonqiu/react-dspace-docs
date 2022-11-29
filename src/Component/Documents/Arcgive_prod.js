@@ -101,17 +101,6 @@ export default function Archive(props) {
         maxHeight: 500,
       };
 
-      // useEffect(()=>{
-      //   var data = new FormData();
-      //   fetch('https://voyages3-api.crc.rice.edu/docs/',{
-      //     method: 'POST',
-      //     body: data,
-      //     headers: {'Authorization':AUTH_TOKEN}
-      //   }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
-      //   fetchData()
-      // },[])
-
-
       
 
       const fetchData = async () => {
@@ -226,21 +215,11 @@ export default function Archive(props) {
       console.log('filter obj changed...')
       setPage(0)
       fetchData2()
-      //fetchDecision(true)
           
         
       }, [
         filter_obj
       ])
-
-      // const fetchDecision = (newPage) => {
-      //   if (newPage){
-      //     return fetchData2()
-      //   }else{
-      //     return fetchData()
-      //   }
-      // }
-
 
       
 
