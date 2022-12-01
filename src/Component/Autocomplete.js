@@ -4,8 +4,8 @@ import Autocomplete from '@mui/material/Autocomplete';
 
 const header = { "Authorization": process.env.REACT_APP_AUTHTOKEN }
 const base_url = process.env.REACT_APP_BASEURL;
-const url = 'https://voyages3-api.crc.rice.edu/docs/autocomplete';
-const adurl = '127.0.0.1:8000/advertisement/autocomplete'
+//change base_url to connect to the advertisement app
+//const base_url = process.env.AD_APP_BASEURL;
 const key = "title"
 
 export default function Auto(props) {
@@ -20,7 +20,7 @@ export default function Auto(props) {
     React.useEffect(() => {
         const fetchData = async (textInput) => {           // not sure how to put in key (originally labels)
             var formdata = new FormData();
-            formdata.append("title", textInput);
+            formdata.append(key, textInput);
 
 
             var requestOptions = {
@@ -31,7 +31,7 @@ export default function Auto(props) {
             };
 
 
-            fetch(url, requestOptions)
+            fetch(base_url + 'autocomplete', requestOptions)
                 .then(response => response.json())
                 .then(result => {
                     var newOptions = result['results'][0]

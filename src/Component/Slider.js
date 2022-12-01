@@ -7,8 +7,9 @@ import { Slider } from '@mui/material';
 
 
 const base_url = process.env.REACT_APP_BASEURL;
-const url = 'https://voyages3-api.crc.rice.edu/docs/aggregations';
-const adurl = "127.0.0.1:8000/advertisement/aggregations"
+//change base_url to connect to the advertisement app
+//const base_url = process.env.AD_APP_BASEURL;
+
 const key = "pub_year"
 
 
@@ -21,35 +22,42 @@ export default function GetSlider(props) {
 
     const {filter_obj:filter_obj, set_filter_obj:set_filter_obj} = props.state;
 
-    // const [range, setRange] = React.useState([0, 1873])
-    // const [value, setValue] = React.useState([range[0] / 2, range[1] / 2])
+    const [range, setRange] = React.useState([0, 0])
+    const [value, setValue] = React.useState([range[0] / 2, range[1] / 2])
 
-    const [range, setRange] = React.useState([0, 1873])
-    const [value, setValue] = React.useState(filter_obj[key] ? filter_obj[key] : [0, range[1]])
+    // const [range, setRange] = React.useState([0, 1873])
+    // const [value, setValue] = React.useState(filter_obj[key] ? filter_obj[key] : [0, range[1]])
 
 
     var d = new FormData();
-    d.append('aggregate_fields', 'pub_year');
+    d.append('aggregate_fields', key);
     const AUTH_TOKEN = process.env.REACT_APP_AUTHTOKEN;
 
 
     const config = {
         method: 'post',
-        baseURL: url,
+        baseURL: base_url + 'aggregations',
         headers: { 'Authorization': AUTH_TOKEN },
         data: d
     }
 
-    React.useEffect(() => {
-        axios(config).then(res => {
+    // React.useEffect(() => {
+    //     axios(config).then(res => {
         
-                if(d[key] && d[key][0] === 0){
-                    setRange([Object.values(res.data)['min'], Object.values(res.data)['max']]);
-                    setValue([Object.values(res.data)['min'], Object.values(res.data)['max']]);
-                }
+    //             if(d[key] && d[key][0] === 0){
+    //                 setRange([Object.values(res.data)['min'], Object.values(res.data)['max']]);
+    //                 setValue([Object.values(res.data)['min'], Object.values(res.data)['max']]);
+    //             }
 
             
         
+    //     }).then(console.log("HTTP resquest from Slider", config))
+    // }, [])
+
+    React.useEffect(() => {
+        axios(config).then(res => {
+            setRange([Object.values(res.data)[0]['min'], Object.values(res.data)[0]['max']]);
+            setValue([Object.values(res.data)[0]['min'], Object.values(res.data)[0]['max']]);
         }).then(console.log("HTTP resquest from Slider", config))
     }, [])
 
