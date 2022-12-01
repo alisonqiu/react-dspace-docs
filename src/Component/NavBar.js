@@ -30,7 +30,6 @@ export default function ResponsiveAppBar(props) {
   const state_filter = {
     filter_obj: filter_obj,
     set_filter_obj: set_filter_obj}
-  //console.log("---docapp,",filter_obj)
 
   const handleOpen = useCallback(() => setDrawerOpen(true), []);
 
@@ -88,7 +87,7 @@ export default function ResponsiveAppBar(props) {
                     height="fit content" 
                     //sx={{ ml:"40px"}}
                 >
-          <Typography sx={{ m:"10px" ,justifyContent:"center" }}>search by author</Typography>
+          <Typography sx={{ m:"10px" ,justifyContent:"center" }}>search by title</Typography>
         
           <Auto 
           state={state_filter}

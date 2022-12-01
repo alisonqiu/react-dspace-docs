@@ -43,7 +43,7 @@ export default function GetSlider(props) {
     React.useEffect(() => {
         axios(config).then(res => {
         
-                if(d[key][0] === 0){
+                if(d[key] && d[key][0] === 0){
                     setRange([Object.values(res.data)['min'], Object.values(res.data)['max']]);
                     setValue([Object.values(res.data)['min'], Object.values(res.data)['max']]);
                 }

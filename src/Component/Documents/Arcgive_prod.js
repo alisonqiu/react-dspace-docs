@@ -63,15 +63,12 @@ export default function Archive(props) {
     const [manifest, setManifest]= useState({});
     const [open, setOpen] = useState(false);
     const [hasMore, setHasMore] = useState(true);
-    const [total, setTotal] = useState(0);
     var [page, setPage] = React.useState(0);
     const [apiUrl,setapiurl] = React.useState([])
     const [itemData, setData] = React.useState([])
-    const [showImage,setShowImage] = React.useState(true)
 
     //from enslaved
     const [isLoading, setIsLoading] = useState(false);
-  const [dataList, setDataList] = useState([]);
   const [pagination, setPagination] = useState({
     currPage: 0,
     rowsPerPage: 16,
@@ -79,12 +76,7 @@ export default function Archive(props) {
   });
 
 
-    const {filter_obj, set_filter_obj,
-          //page, setPage,
-          // apiUrl,setapiurl,
-          // itemData, setData,
-          //showImage,setShowImage
-        } = props.state;
+    const {filter_obj, set_filter_obj} = props.state;
 
  
 
@@ -104,7 +96,6 @@ export default function Archive(props) {
       
 
       const fetchData = async () => {
-        console.log("insdie fetchData" )
         var data = new FormData();
         data.append("hierarchical", "False");
           

@@ -20,7 +20,7 @@ import { alpha } from "@mui/material";
 const AUTH_TOKEN = process.env.AD_APP_AUTHTOKEN;
 const adurl = "http://127.0.0.1:8000/advertisement/"
 const url = 'https://voyages3-api.crc.rice.edu/docs/'
-axios.defaults.baseURL = process.env.REACT_APP_BASEURL;
+axios.defaults.baseURL = process.env.AD_APP_BASEURL;
 axios.defaults.headers.common["Authorization"] = AUTH_TOKEN;
 function useUniversalViewer(ref, options) {
     const [uv, setUv] = useState();
@@ -58,17 +58,24 @@ function curImage(src){
   
 }
 export default function Archive(props) {
-    const [width, height] = useWindowSize()
-    const [manifest, setManifest]= useState({});
-    const [open, setOpen] = useState(false);
-    const [apiUrl,setapiurl] = useState([])
-    const [itemData, setData] = useState([])
-    const [hasMore, setHasMore] = useState(true)
-    const {filter_obj, set_filter_obj} = props.state;
+  const [width, height] = useWindowSize()
+  const [manifest, setManifest]= useState({});
+  const [open, setOpen] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  var [page, setPage] = React.useState(0);
+  const [apiUrl,setapiurl] = React.useState([])
+  const [itemData, setData] = React.useState([])
 
-    const [page, setPage] = React.useState(0);
-    const [rowsPerPage, setRowsPerPage] = React.useState(16);
-    const [total, setTotal] = useState(0)
+  //from enslaved
+  const [isLoading, setIsLoading] = useState(false);
+const [pagination, setPagination] = useState({
+  currPage: 0,
+  rowsPerPage: 16,
+  totalRows: 0,
+});
+
+
+  const {filter_obj, set_filter_obj} = props.state;
 
     const handleOpen = (manifest) => {
       setOpen(true);
@@ -99,7 +106,7 @@ export default function Archive(props) {
       var data = new FormData();
 
         data.append("hierarchical", "False");
-        data.append("results_per_page", rowsPerPage);
+        data.append("results_per_page", 16);
         data.append("results_page", page+1);
          for (const property in filter_obj) {
           filter_obj[property].forEach((v) => {
@@ -117,6 +124,7 @@ export default function Archive(props) {
         
         const fetchImage = async ()=> {
           const promises = result.map(item => {
+            console.log("🚀 ~ file: ArcAd.js:127 ~ promises ~ item", item)
             return fetch(item.dspace_iiif_uri, {
               method: "GET",
             }).then(res => {
@@ -139,38 +147,81 @@ export default function Archive(props) {
         fetchImage().catch(console.error);
       }
 
-      useEffect(()=>{
-        console.log("filter object updated")
+      const fetchImage2 = async (result)=> {
+        const promises = result.map(item => {
+          return fetch(item['dspace_iiif_uri'], {
+            method: "GET",
+          }).then(res => {
+            return res.json()
+          }).then(res => {
+            //console.log(uri,"🚀 ~ file: Arcgive_prod.js ~ line 130 ~ returnfetch ~ res", res)
+            var dict = {"title": res.title, "image": curImage(res.thumbnail[0].id),"uri":item.dspace_iiif_uri}
+            
+            return dict;
+          })
+        })
+        const response = await Promise.all(promises)
+        setData([ ...response])
+      
+      }
 
-        // var data = new FormData();
-        // fetch('https://voyages3-api.crc.rice.edu/docs/',{
-        //   method: 'POST',
-        //   body: data,
-        //   headers: {'Authorization':AUTH_TOKEN}
-        // }).then(res=>setTotal(parseInt(res.headers.get("total_results_count"))));
+      const fetchData2 = async ()=> {
+        console.log("insdie fetchData2" )
 
-        //when filter_obj changes, go back to first page
-        // if(filter_obj !== {}){
-        // window.location.reload()
-
-        // }
-        setPage(0);
-        setData([])
-        setapiurl( [])
-        fetchData()
-        // setHasMore(true)
+          setHasMore(true)
+          setIsLoading(true);
+          setData([]);
+          let queryData = new FormData();
+          queryData.append("hierarchical", "False");
+          queryData.append("results_page", pagination.currPage + 1);
+      //   queryData.append("selected_fields", 'url');
+          queryData.append("results_per_page", pagination.rowsPerPage);
           
-        
+          for (const property in filter_obj) {
+            filter_obj[property].forEach((v) => {
+              queryData.append(property, v);
+            });
+          }
+          
+          axios.post("/", queryData).then((res) => {
+            setPagination({
+              ...pagination,
+              totalRows: Number(res.headers.total_results_count),
+            });
+            setapiurl(res.data.url)
+            setPage(page=>page+1)
+
+         
+
+        fetchImage2(res.data).then(
+            setIsLoading(false)
+        ).catch(console.error);
+          })
+  
+          
+      
+          }
+
+
+
+      useEffect(()=>{
+       
+        console.log('filter obj changed...')
+        setPage(0)
+        fetchData()
       }, [filter_obj])
 
 
 
 
     return (
+
       <div id="infinite-container" style={{ overflow: 'auto'}}>
+      {!isLoading? 
       <InfiniteScroll
       dataLength={itemData.length} //This is important field to render the next data
       next={fetchData}
+      //next={fetchDecision()}
       getScrollParent={()=>document.getElementById('infinite-container')} 
       useWindow={false}
 
@@ -180,55 +231,59 @@ export default function Archive(props) {
         <p style={{ textAlign: 'center' }}>
           end message
         </p>
-      } >
+      } 
+      
+      >
 
 
-<ImageList sx={{ width: width, height: "99%" }} cols={
-              Math.sqrt(rowsPerPage)
-              } gap={30} >
-     
-              {itemData.map((item) => (
-                <ImageListItem key={item.image}>
-                  <img
-                    src={`${item.image}?w=248&fit=crop&auto=format`}
-                    srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
-                    alt={item.title}
-                    loading="lazy"
-                  />
-                  <ImageListItemBar
-                    title={item.title}
-                    sx ={{
-                      bgcolor: alpha('#549165',0.8)
-                    }}
-                    actionIcon={
-                      <IconButton
-                        sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
-                        aria-label={`info about ${item.title}`}
-                        onClick={() => handleOpen(item.uri.url)}
-                      >
-                        <InfoIcon />
-                      </IconButton>
-                    }
-                  />
-                </ImageListItem>
-              ))}
-              
-            </ImageList>
-    
-    
+    <ImageList sx={{ width: width, height: "99%" }} cols={
+      Math.sqrt(16)
+      } gap={30} >
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={modalStyle}>
-                    <UV manifest={manifest} />
-                </Box>
-            </Modal>
+      {itemData.map((item) => (
+        <ImageListItem key={item.image}>
+          <img
+            src={`${item.image}?w=248&fit=crop&auto=format`}
+            srcSet={`${item.image}?w=248&fit=crop&auto=format&dpr=2 2x`}
+            alt={item.title}
+            loading="lazy"
+          />
+          <ImageListItemBar
+            title={item.title}
+            sx ={{
+              bgcolor: alpha('#549165',0.8)
+            }}
+            actionIcon={
+              <IconButton
+                sx={{ color: 'rgba(255, 255, 255, 0.54)' }}
+                aria-label={`info about ${item.title}`}
+                onClick={() => handleOpen(item.uri.url)}
+              >
+                <InfoIcon />
+              </IconButton>
+            }
+          />
+        </ImageListItem>
+      ))}
+      
+    </ImageList>
+                
+        
 
-        </InfiniteScroll>
-        </div>
+                <Modal
+                    open={open}
+                    onClose={handleClose}
+                    aria-labelledby="modal-modal-title"
+                    aria-describedby="modal-modal-description"
+                >
+                    <Box sx={modalStyle}>
+                        <UV manifest={manifest} />
+                    </Box>
+                </Modal>
+
+            </InfiniteScroll>
+    :null}
+
+      </div>
     );
 }
